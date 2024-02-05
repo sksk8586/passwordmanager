@@ -1,0 +1,123 @@
+from tkinter import *
+from tkinter import messagebox
+import random
+import pyperclip
+import json
+# ---------------------------- PASSWORD GENERATOR ------------------------------- #
+letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+def genpassword():
+    nr_letters = random.randint(8,10)
+    nr_symbols = random.randint(2, 4)
+    nr_numbers = random.randint(2, 4)
+
+
+    letters_list =[random.choice(letters) for n in range(nr_letters)]
+
+
+    symbols_list =[random.choice(symbols) for n in range(nr_symbols)]
+
+
+    numbers_list =[random.choice(numbers) for n in range(nr_numbers)]
+
+
+    password_list = symbols_list + letters_list + numbers_list
+    random.shuffle(password_list)
+    str = "".join(password_list)
+    #print(str)
+
+
+    passe.insert(0, string= str)
+    pyperclip.copy(str)
+
+# ---------------------------- SAVE PASSWORD ------------------------------- #
+
+def save():
+    web_input = webe.get()
+    email_input = eue.get()
+    pass_input = passe.get()
+
+    new_dict = {web_input: {"email": email_input, "password": pass_input}}
+
+    if len(web_input) == 0 or len(pass_input) == 0:
+        messagebox.showinfo(title = "Empty Input", message="Please fill out all boxes")
+    else:
+        try:
+            with open("myfile.json", mode = "r") as datafile:
+                data = json.load(datafile)
+        except FileNotFoundError:
+            with open("myfile.json", mode="w") as datafile:
+                json.dump(new_dict, datafile, indent=4)
+        else:
+            data.update(new_dict)
+
+            with open("myfile.json", mode="w") as datafile:
+                json.dump(data, datafile, indent=4)
+        finally:
+            webe.delete(0,END)
+            passe.delete(0, END)
+
+# ---------------------------- UI SETUP ------------------------------- #
+
+def find_password():
+    web_input = webe.get()
+    try:
+        with open("myfile.json", mode="r") as something:
+            data = json.load(something)
+    except FileNotFoundError:
+        messagebox.showinfo(title="Error", message= "File doesn't exist ")
+    else:
+        if web_input in data:
+            email = data[web_input]["email"]
+            password = data[web_input]["password"]
+            messagebox.showinfo(title = web_input, message= f"email:{email}\npassword:{password}")
+        else:
+            messagebox.showinfo(title="Error", message="Website is not saved")
+
+# ---------------------------- SEARCH ------------------------------- #
+window = Tk()
+window.title("My Password Manager")
+window.config(padx = 50, pady = 50)
+
+
+canvas = Canvas(height = 200,width = 200)
+logo_img = PhotoImage(file = "logo.png")
+canvas.create_image(100, 100,image = logo_img)
+canvas.grid(row = 0, column = 1)
+
+
+
+#labels
+webl = Label(text ="Website:")
+webl.grid(row= 1, column = 0)
+
+eul = Label(text = "Email/Username:")
+eul.grid(row = 2, column = 0)
+
+passl = Label(text = "Password:")
+passl.grid(row = 3, column = 0)
+
+#entry
+webe = Entry()
+webe.grid(row = 1, column = 1)
+webe.focus()
+
+eue = Entry(width = 40)
+eue.grid(row = 2, column = 1, columnspan=2 )
+eue.insert(0, YOUR EMAIL HERE)
+passe = Entry()
+passe.grid(row = 3, column = 1)
+
+#buttons
+genpass = Button(text = "Generate Password", command = genpassword, width = 15)
+genpass.grid(row = 3, column = 2)
+
+add = Button(text = "Add", width = 36, command =save)
+add.grid(row = 4, column = 1, columnspan= 2)
+
+search = Button(text = "Search", width = 15, command= find_password)
+search.grid(row = 1, column = 2)
+
+
+window.mainloop()
