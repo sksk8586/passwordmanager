@@ -1,4 +1,4 @@
-# passwordmanager
+# Password Manager
 
 
 This simple password manager application is built using the Tkinter library in Python. It allows users to generate strong passwords and store them along with associated website details in a JSON file.
